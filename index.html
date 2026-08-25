@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absen Sholat Online</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #e0f2f1; margin: 0; padding: 20px; }
+        .container { max-width: 400px; background: white; margin: auto; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #00796b; margin-bottom: 20px; }
+        label { font-weight: bold; margin-top: 10px; display: block; color: #333; }
+        select, input, button { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
+        button { background-color: #2e7d32; color: white; border: none; font-weight: bold; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #1b5e20; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Absen Sholat</h2>
+    <form id="absenForm">
+        <label>Nama Lengkap:</label>
+        <input type="text" id="nama" required placeholder="Masukkan nama Anda">
+
+        <label>Tanggal & Bulan Absen:</label>
+        <input type="date" id="tanggalAbsen" required>
+
+        <label>Pilih Sholat:</label>
+        <select id="sholat">
+            <option value="Subuh">Subuh</option>
+            <option value="Dzuhur">Dzuhur</option>
+            <option value="Ashar">Ashar</option>
+            <option value="Maghrib">Maghrib</option>
+            <option value="Isya">Isya</option>
+        </select>
+
+        <label>Status Kehadiran:</label>
+        <select id="status">
+            <option value="Berjamaah">Berjamaah</option>
+            <option value="Sendiri">Sendiri (Munfarid)</option>
+            <option value="Berhalangan">Berhalangan/Uzur</option>
+        </select>
+
+        <button type="submit">KIRIM ABSEN</button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('tanggalAbsen').valueAsDate = new Date();
+
+    document.getElementById("absenForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        
+        const urlAppsScript = 'https://script.google.com/macros/s/AKfycbx8PtHHolVSFFMkyIT1_S0b0qxtC4RnF23KVUAArGOvJvmb9Kc90QuQ_oRwC9lHJ-bG/exec';
+        let btnSubmit = document.querySelector("button[type='submit']");
+        
+        btnSubmit.innerText = "Mengirim Data...";
+        btnSubmit.disabled = true;
+
+        let payload = {
+            nama: document.getElementById("nama").value,
+            tanggal: document.getElementById("tanggalAbsen").value,
+            sholat: document.getElementById("sholat").value,
+            status: document.getElementById("status").value
+        };
+
+        fetch(urlAppsScript, {
+            method: "POST",
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.text())
+        .then(data => {
+            alert("Absen berhasil dikirim ke spreadsheet!");
+            document.getElementById("absenForm").reset();
+            document.getElementById('tanggalAbsen').valueAsDate = new Date();
+            btnSubmit.innerText = "KIRIM ABSEN";
+            btnSubmit.disabled = false;
+        })
+        .catch(err => {
+            alert("Gagal mengirim absen.");
+            btnSubmit.innerText = "KIRIM ABSEN";
+            btnSubmit.disabled = false;
+        });
+    });
+</script>
+
+</body>
+</html>
